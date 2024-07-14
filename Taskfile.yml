@@ -1,0 +1,49 @@
+version: '3'
+
+vars:
+  APP_NAME: sso
+  SRC_DIR: ./cmd/{{.APP_NAME}}
+  BIN_DIR: ./build
+  GO_FILES: |
+    sh: find ./ -name '*.go'
+  CONFIG_PATH: ./config/local.yaml
+  VERSION: 0.0.1
+
+tasks:
+  default:
+    cmds:
+      - task: run
+    desc: Default task
+
+  format:
+    cmds:
+      - gofmt -w {{.GO_FILES}}
+    desc: Format the code
+
+  build:
+    cmds:
+      - task: clean
+      - go build -o {{.BIN_DIR}}/{{.APP_NAME}} {{.SRC_DIR}}/*.go
+    desc: Build the project
+
+  test:
+    cmds:
+      - go test ./... -v
+    desc: Run tests
+
+  clean:
+    cmds:
+      - rm -f {{.BIN_DIR}}/{{.APP_NAME}}
+    desc: Clean up build artifacts
+
+  package:
+    cmds:
+      - task: build
+      - tar -czvf {{.APP_NAME}}_{{.VERSION}}.tar.gz -C {{.BIN_DIR}} {{.APP_NAME}}
+    desc: Package the project for deployment
+
+  run:
+    cmds:
+      - task: build
+      - ./{{.BIN_DIR}}/{{.APP_NAME}} --config={{.CONFIG_PATH}}
+    desc: Run the application
