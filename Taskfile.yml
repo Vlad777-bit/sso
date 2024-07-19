@@ -47,3 +47,9 @@ tasks:
       - task: build
       - ./{{.BIN_DIR}}/{{.APP_NAME}} --config={{.CONFIG_PATH}}
     desc: Run the application
+
+  migrate:
+    cmds:
+      - go build -o {{.BIN_DIR}}/migrator ./cmd/migrator/*.go
+      - ./{{.BIN_DIR}}/migrator --storage-path=./storage/{{.APP_NAME}}.db --migrations-path=./migrations
+    desc: Run migrations
